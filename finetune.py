@@ -41,6 +41,9 @@ parser.add_argument('--data_dir', type=str, default='./data',help='location for 
 
 args = parser.parse_args()
 
+
+import os
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:512"
 # take in args
 
 use_amp = True
@@ -81,14 +84,14 @@ if args.net == 'vit_tiny':
 elif args.net == 'vit_small':
     net = vit_small_patch16(global_pool=True)
     net.head = nn.Linear(384, args.classes)
-elif args.net == 'CRATE_tiny':
-    net = CRATE_tiny(args.classes)
+elif args.net == 'CRATE_Feat':
+    net = CRATE_Feat(args.classes,pretrained_path=args.ckpt_dir,device=device)
 elif args.net == "CRATE_small":
-    net = CRATE_small(args.classes)
+     net = CRATE_small(args.classes)
 elif args.net == "CRATE_base":
-    net = CRATE_base(args.classes)
+     net = CRATE_base(args.classes)
 elif args.net == "CRATE_large":
-    net = CRATE_large(args.classes)
+     net = CRATE_large(args.classes)
 
 # For Multi-GPU
 if 'cuda' in device:
