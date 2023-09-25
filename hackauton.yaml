@@ -1,0 +1,11 @@
+name: hackauton
+channels: 
+  - defaults 
+dependencies: 
+  - torchvision 
+  - einops 
+  - argparse
+  - timm 
+  - lion_pytorch 
+  - torch
+  - numpy 

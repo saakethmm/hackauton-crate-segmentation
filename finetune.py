@@ -84,8 +84,8 @@ if args.net == 'vit_tiny':
 elif args.net == 'vit_small':
     net = vit_small_patch16(global_pool=True)
     net.head = nn.Linear(384, args.classes)
-elif args.net == 'CRATE_Feat':
-    net = CRATE_Feat(args.classes,pretrained_path=args.ckpt_dir,device=device)
+elif args.net == 'CRATE_tiny':
+    net = CRATE_tiny(args.classes)
 elif args.net == "CRATE_small":
      net = CRATE_small(args.classes)
 elif args.net == "CRATE_base":
@@ -100,9 +100,11 @@ if 'cuda' in device:
     net = torch.nn.DataParallel(net) # make parallel
     if args.ckpt_dir is not None:
         #upd keys
-        state_dict = torch.load(args.ckpt_dir)['state_dict']
+        state_dict = torch.load(args.ckpt_dir)
+        print(state_dict)
         for key in list(state_dict.keys()):
-            if 'mlp_head' in key:
+            #if 'mlp_head' in key:
+            if 'head' in key and len(key)<5:
                 del state_dict[key]
                 print("deleted:", key)
         net.load_state_dict(state_dict, strict=False)
@@ -111,8 +113,9 @@ if args.resume:
     # Load checkpoint.
     print('==> Resuming from checkpoint..')
     assert os.path.isdir('checkpoint'), 'Error: no checkpoint directory found!'
-    checkpoint = torch.load('./checkpoint/{}-ckpt.t7'.format(args.net))
-    net.load_state_dict(checkpoint['net'])
+    checkpoint = torch.load('/jet/home/guntakan/crate-emergence-notebooks/crate-demo.pth',device=device)
+    #checkpoint = torch.load('./checkpoint/{}-ckpt.t7'.format(args.net))
+    net.load_state_dict(checkpoint['state_dict'])
     best_acc = checkpoint['acc']
     start_epoch = checkpoint['epoch']
 
@@ -187,7 +190,7 @@ def test(epoch):
               "scaler": scaler.state_dict()}
         if not os.path.isdir('checkpoint'):
             os.mkdir('checkpoint')
-        torch.save(state, './checkpoint/'+args.net+'-{}-ckpt.t7'.format(args.patch))
+        torch.save(state, './checkpoint/'+args.net+args.data+'-{}-ckpt.t7'.format(args.patch))
         best_acc = acc
     
     os.makedirs("log", exist_ok=True)

@@ -303,8 +303,8 @@ class CRATEFeat(nn.Module):
             self.model = CRATE_small(10)
         elif crate_arch == 'base':
             self.model = CRATE_base(10)
-        elif crate_arch == 'tiny':
-            self.model = CRATE_tiny(10)
+        elif crate_arch == 'large':
+            self.model = CRATE_large(10)
         #elif crate_arch == 'demo':
         #     self.model = CRATE_base_demo()
         #     self.model.mlp_head = nn.Sequential(
@@ -399,10 +399,10 @@ class CRATEFeat(nn.Module):
 
 #from crate import CRATEFeat
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
-model = CRATEFeat(feat_dim = 768, crate_arch = 'base',pretrained_path = '/jet/home/guntakan/CRATE/checkpoint/CRATE_base-4-ckpt.t7', device = device)
+model = CRATEFeat(feat_dim = 768, crate_arch = 'large',pretrained_path = '/jet/home/guntakan/CRATE/checkpoint/CRATE_large braintumor -4-ckpt.t7', device = device)
 
 def collect_attention_maps(img_dir, image_size, patch_size, layer):
-    img_list = sorted(os.listdir(img_dir))
+    img_list = sorted(os.listdir(img_dir))[:2]
     attn_list = []
     resized_images = []
     for img_name in tqdm(img_list):
@@ -413,7 +413,7 @@ def collect_attention_maps(img_dir, image_size, patch_size, layer):
         transform = pth_transforms.Compose([
             pth_transforms.Resize((image_size, image_size)),
             pth_transforms.ToTensor(),
-            pth_transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
+            #pth_transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
         ])
         img = transform(img)
         w, h = img.shape[1] - img.shape[1] % patch_size, img.shape[2] - img.shape[2] % patch_size
@@ -431,16 +431,17 @@ def collect_attention_maps(img_dir, image_size, patch_size, layer):
     return attn_list, resized_images
 
 
-img_dir = '/jet/home/guntakan/crate-emergence-notebooks/demo'
-image_size = 480
+img_dir = '/jet/home/guntakan/braintumor/Testing/glioma'
+image_size = 640
 patch_size = 16
 layer = 11
 
 attentions_list, imgs = collect_attention_maps(img_dir, image_size, patch_size, layer)
-plt.figure(figsize=(15, 3))
-fig, axs = plt.subplots(len(imgs),13)
+plt.figure(figsize=(45, 15))
+fig, axs = plt.subplots(len(imgs),17)
 for i, img in enumerate(imgs):
     attentions = attentions_list[i]
+    print(len(attentions))
     nh = attentions.shape[0]
     #print(i,nh)
     #plt.subplot(1,nh + 1,1)

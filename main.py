@@ -247,7 +247,7 @@ def main_worker(gpu, ngpus_per_node, args):
         val_dataset = datasets.FakeData(50000, (3, 224, 224), 1000, transforms.ToTensor())
     else:
         traindir = os.path.join(args.data, 'train')
-        valdir = os.path.join(args.data, 'val')
+        valdir = os.path.join(args.data, 'test')
         normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                      std=[0.229, 0.224, 0.225])
 

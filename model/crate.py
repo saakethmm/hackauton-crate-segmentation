@@ -122,8 +122,10 @@ class CRATE(nn.Module):
 
         self.mlp_head = nn.Sequential(
             nn.LayerNorm(dim),
-            nn.Linear(dim, num_classes)
+            nn.Linear(dim, dim)
         )
+
+        self.head = nn.Linear(dim,num_classes)
 
     def forward(self, img):
         x = self.to_patch_embedding(img)
@@ -139,8 +141,10 @@ class CRATE(nn.Module):
         x = x.mean(dim = 1) if self.pool == 'mean' else x[:, 0]
 
         x = self.to_latent(x)
+        x = self.mlp_head(x)
         feature_last = x
-        return self.mlp_head(x)
+
+        return self.head(x)
 
 
 def CRATE_tiny(num_classes = 1000):
@@ -165,24 +169,24 @@ def CRATE_small(num_classes = 1000):
                     emb_dropout=0.0,
                     dim_head=576//12)
 
-def CRATE_base(num_classes = 1000):
+def CRATE_base(num_classes=10000):
     return CRATE(image_size=224,
-                patch_size=16,
-                num_classes=num_classes,
-                dim=768,
-                depth=12,
-                heads=12,
-                dropout=0.0,
-                emb_dropout=0.0,
-                dim_head=768//12)
+            patch_size=8,
+            num_classes=21842,
+            dim=768,
+            depth=12,
+            heads=6,
+            dropout=0.0,
+            emb_dropout=0.0,
+            dim_head=768//6)
 
 def CRATE_large(num_classes = 1000):
     return CRATE(image_size=224,
-                patch_size=16,
+                patch_size=8,
                 num_classes=num_classes,
-                dim=1024,
-                depth=24,
+                dim=512,
+                depth=18,
                 heads=16,
-                dropout=0.0,
+                dropout=0.1,
                 emb_dropout=0.0,
                 dim_head=1024//16)
